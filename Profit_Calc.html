@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>အမြတ်နှုန်းတွက်ချက်</title>
+    <style>
+        body {
+            background-color: #f0f4f8;
+            background-image: linear-gradient(to bottom right, #83a4d4, #b6fbff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 350px;
+            margin: auto;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        button {
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        h3 {
+            text-align: center;
+            color: #333;
+        }
+        #result {
+            color: blue;
+            font-size: 18px;
+        }
+        #profit {
+            color: green;
+            font-size: 18px;
+        }
+        .alert {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>အမြတ်နှုန်းတွက်ချက်</h2>
+
+        <div class="form-group">
+            <label for="costPrice">၀ယ်ရင်းစျေး (ကျပ်):</label>
+            <input type="number" id="costPrice" placeholder="၀ယ်ရင်းစျေးရိုက်ထည့်ပါ" onfocus="clearText(this)">
+        </div>
+
+        <div class="form-group">
+            <label for="sellingPrice">ရောင်းစျေး (ကျပ်):</label>
+            <input type="number" id="sellingPrice" placeholder="ရောင်းစျေးရိုက်ထည့်ပါ" onfocus="clearText(this)">
+        </div>
+
+        <div class="form-group">
+            <label for="taxRate">အခွန်နှုန်း (%):</label>
+            <input type="number" id="taxRate" placeholder="အခွန်နှုန်းရိုက်ထည့်ပါ" onfocus="clearText(this)">
+        </div>
+
+        <div class="form-group">
+            <label for="profitMargin">အမြတ်နှုန်း (%):</label>
+            <input type="number" id="profitMargin" placeholder="အမြတ်နှုန်းရိုက်ထည့်ပါ" onfocus="clearText(this)">
+        </div>
+
+        <button onclick="calculate()">တွက်ချက်မည်</button>
+
+        <h3>result： <span id="result">--</span></h3>
+        <h3>profit： <span id="profit">--</span></h3>
+
+        <div class="alert" id="error-message" style="display:none;"></div>
+    </div>
+
+    <script>
+        function calculate() {
+            let costPrice = parseFloat(document.getElementById('costPrice').value);
+            let sellingPrice = parseFloat(document.getElementById('sellingPrice').value);
+            let taxRate = parseFloat(document.getElementById('taxRate').value);
+            let profitMargin = parseFloat(document.getElementById('profitMargin').value);
+            let resultText = document.getElementById('result');
+            let profitText = document.getElementById('profit');
+            let errorMessage = document.getElementById('error-message');
+
+            resultText.innerText = '---';
+            profitText.innerText = '---';
+            errorMessage.style.display = 'none';
+
+            if (isNaN(costPrice)) {
+                errorMessage.textContent = 'ကျေးဇူးပြု၍ ဝယ်ရင်းစျေးကိုရိုက်ထည့်ပါ။';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (!isNaN(profitMargin)) {
+                let profitRate = profitMargin / 100;
+                let calculatedSellingPrice = costPrice / (1 - profitRate - (taxRate / 100));
+
+                let taxAmount = calculatedSellingPrice * (taxRate / 100);
+
+                let netProfit = calculatedSellingPrice - costPrice - taxAmount;
+
+                resultText.innerText = `ရောင်းစျေး: ${calculatedSellingPrice.toFixed(2)} ကျပ်(Tax)`;
+                profitText.innerText = `အမြတ်: ${netProfit.toFixed(2)} ကျပ်`;
+            } else if (!isNaN(sellingPrice)) {
+                let taxAmount = sellingPrice * (taxRate / 100);
+
+                let netProfit = sellingPrice - costPrice - taxAmount;
+
+                let profitRate = (netProfit / sellingPrice) * 100;
+
+                resultText.innerText = `အမြတ်နှုန်း: ${profitRate.toFixed(2)} %(Tax)`;
+                profitText.innerText = `အမြတ်: ${netProfit.toFixed(2)} ကျပ်`;
+            } else {
+                errorMessage.textContent = 'ကျေးဇူးပြု၍ ရောင်းစျေး သို့မဟုတ် အမြတ်နှုန်းကိုရိုက်ထည့်ပါ။';
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function clearText(inputElement) {
+            inputElement.value = '';
+        }
+    </script>
+</body>
+</html>
